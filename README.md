@@ -1,27 +1,28 @@
-# {PROJECT NAME}
-## NHS England Digitial Analytics and Research Team - PhD Internship Project
+# Community Waiting List Regional Analysis
+## NHS South West Intelligence and Insights Team
 
 ### About the Project
 
-[![status: experimental](https://github.com/GIScience/badges/raw/master/status/experimental.svg)](https://github.com/GIScience/badges#experimental)
-
-This repository holds code for the {PROJECT NAME} {SHORT DESCRIPTION}
-
-[Link to original project propsoal](https://nhsx.github.io/nhsx-internship-projects/)
+This is an analysis of community waiting times, it can be run across national data and drawne down to a regional level.
 
 _**Note:** Only public or fake data are shared in this repository._
 
 ### Project Stucture
 
 - The main code is found in the root of the repository (see Usage below for more information)
-- The accompanying [report](./reports/report.pdf) is also available in the `reports` folder
-- More information about the code usage can be found in the [model card](./model_card.md)
-- {OTHER REPO STRUCTURE}
 
 ### Built With
 
-[![Python v3.8](https://img.shields.io/badge/python-v3.8-blue.svg)](https://www.python.org/downloads/release/python-380/)
-- {LIST OF MAIN PACKAGE VERSIONS}
+[R Studio](RStudio Team (2020). RStudio: Integrated Development for R. RStudio, PBC, Boston, MA URL http://www.rstudio.com/.)  
+[R Statistical Software](  R Core Team (2018). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. URL https://www.R-project.org/.)
+
+- library(tidyverse)
+- library(janitor)
+- library(readxl)
+- library(NHSRplotthedots)
+- library(gt)
+- library(gtExtras)
+- library(english)
 
 ### Getting Started
 
@@ -31,27 +32,28 @@ To get a local copy up and running follow these simple steps.
 
 To clone the repo:
 
-`git clone https://github.com/nhsx/{REPO NAME}`
 
-To create a suitable environment:
-- ```python -m venv _env```
-- `source _env/bin/activate`
-- `pip install -r requirements.txt`
-
-{ADDITIONAL TECHNICAL SUPPORT AND NEEDS} 
 
 ### Usage
-{DESCRIPTION OF CODE}
+Data for this code is currently obtain from NHS futures.
+
+https://future.nhs.uk/CommunityHealthServices/view?objectId=16189616
+
+You can select the region that the report runs against at the start of the code
 
 #### Outputs
-{LIST AND DESCRIPTION OF OUTPUTS}
+The report produces an interactive quarto document.
 
-{NOTES ON REPRODUCIBILITY OF RESULTS}
+
 
 #### Datasets
-{DESCRIPTION AND LINKS TO DATASETS}
+Data for this code is currently obtain from NHS futures.
 
-{LINK TO FAKE DATA TO SUPPORT INITAIL CODE RUNS}
+https://future.nhs.uk/CommunityHealthServices/view?objectId=16189616
+
+This data is made availabkle publicaly, just not in this format.
+
+Future version will draw data directly from UDAL.
 
 ### Roadmap
 
@@ -85,7 +87,7 @@ of the [Open Government 3.0][ogl] licence.
 
 ### Contact
 
-To find out more about the [Digitial Analytics and Research Team](https://www.nhsx.nhs.uk/key-tools-and-info/nhsx-analytics-unit/) visit our [project website](https://nhsx.github.io/AnalyticsUnit/projects.html) or get in touch at [analytics-unit@nhsx.nhs.uk](mailto:analytics-unit@nhsx.nhs.uk).
+To find out more  get in touch at [Simon.Wellesley-Miller](mailto:simon.wellesley-miller@nhs.net).
 
-<!-- ### Acknowledgements -->
+
 
