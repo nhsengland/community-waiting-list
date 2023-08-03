@@ -30,20 +30,17 @@ _**Note:** Only public or fake data are shared in this repository._
 
 To get a local copy up and running follow these simple steps.
 
-To clone the repo:
-
-
+Clone the repo
 
 ### Usage
 Data for this code is currently obtain from NHS futures.
 
 https://future.nhs.uk/CommunityHealthServices/view?objectId=16189616
 
-You can select the region that the report runs against at the start of the code
+You can select the region that the report runs against at the start of the code. 
 
 #### Outputs
-The report produces an interactive quarto document.
-
+The report produces an interactive quarto document that is published here https://future.nhs.uk/SouthWestAnalytics .
 
 
 #### Datasets
@@ -51,7 +48,7 @@ Data for this code is currently obtain from NHS futures.
 
 https://future.nhs.uk/CommunityHealthServices/view?objectId=16189616
 
-This data is made availabkle publicaly, just not in this format.
+This data is made available publicaly, just not in this format.
 
 Future version will draw data directly from UDAL.
 
@@ -86,6 +83,8 @@ of the [Open Government 3.0][ogl] licence.
 [ogl]: http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
 
 ### Contact
+
+Simon Wellesley-Miller
 
 To find out more  get in touch at [Simon.Wellesley-Miller](mailto:simon.wellesley-miller@nhs.net).
 
