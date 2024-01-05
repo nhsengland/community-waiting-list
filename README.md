@@ -33,6 +33,7 @@ To get a local copy up and running follow these simple steps.
 Clone the repo
 
 ### Usage
+
 Data for this code is currently obtain from NHS futures.
 
 https://future.nhs.uk/CommunityHealthServices/view?objectId=16189616
@@ -44,6 +45,11 @@ The report produces an interactive quarto document that is published here https:
 
 
 #### Datasets
+Data from this code is taken from UDAL NHSE Data warehouse.  If you have access you will need to run report in UDAL enviorment.
+
+You will need to set up a source file with your personal details, with your 
+
+
 Data for this code is currently obtain from NHS futures.
 
 https://future.nhs.uk/CommunityHealthServices/view?objectId=16189616
