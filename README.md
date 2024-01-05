@@ -33,16 +33,18 @@ To get a local copy up and running follow these simple steps.
 Clone the repo
 
 ### Usage
+Data is drawn from NHSE Udal data warehouse.
 
-Data for this code is currently obtain from NHS futures.
+Similar data data for this code is can ve obtained obtain from NHS futures, unfortunately it is in a differrnt format.
 
 https://future.nhs.uk/CommunityHealthServices/view?objectId=16189616
+
+The report runs for NHS England region to show regional and local ICB comparisons.
 
 You can select the region that the report runs against at the start of the code. 
 
 #### Outputs
 The report produces an interactive quarto document that is published here https://future.nhs.uk/SouthWestAnalytics .
-
 
 #### Datasets
 Data from this code is taken from UDAL NHSE Data warehouse.  If you have access you will need to run report in UDAL enviorment.
