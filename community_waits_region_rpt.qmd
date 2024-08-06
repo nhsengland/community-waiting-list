@@ -55,7 +55,7 @@ crossref:
 # select your region #
 ######################
 
-reg <- "south west"
+reg <- "east of england"
 
 library(tidyverse)
 library(janitor)
@@ -798,30 +798,31 @@ create_table <- function(serv) {
       column = rate_graph, scaled = FALSE,
       fill = "#005EB8", background = "lightblue"
     ) |>
-    # render the rate trend icon (col 5)
-    gt_fa_column(rate_trend,
-      height = px(15),
-      palette = "Black",
-      align = "center"
-    ) |>
-    # render the rate DQ assurance icon (col 6)
-    gt_fa_column(data,
-      height = px(15),
-      palette = "Black",
-      align = "center"
-    ) |>
-    # render the referral trend icon (col 7)
-    gt_fa_column(ref_trend,
-      height = px(15),
-      palette = "Black",
-      align = "center"
-    ) |>
-    # render the referral DQ assurance icon (col 8)
-    gt_fa_column(data_ref_flag,
-      height = px(15),
-      palette = "Black",
-      align = "center"
-    ) |>
+    fmt_icon(columns = c(rate_trend, data, ref_trend,data_ref_flag)) |>
+    # # render the rate trend icon (col 5)
+    # gt_fa_column(rate_trend,
+    #   height = px(15),
+    #   palette = "Black",
+    #   align = "center"
+    # ) |>
+    # # render the rate DQ assurance icon (col 6)
+    # gt_fa_column(data,
+    #   height = px(15),
+    #   palette = "Black",
+    #   align = "center"
+    # ) |>
+    # # render the referral trend icon (col 7)
+    # gt_fa_column(ref_trend,
+    #   height = px(15),
+    #   palette = "Black",
+    #   align = "center"
+    # ) |>
+    # # render the referral DQ assurance icon (col 8)
+    # gt_fa_column(data_ref_flag,
+    #   height = px(15),
+    #   palette = "Black",
+    #   align = "center"
+    # ) |>
     # create the 52 long graph (col 10)
     gt_plt_bar_pct(
       column = perc_graph, 
