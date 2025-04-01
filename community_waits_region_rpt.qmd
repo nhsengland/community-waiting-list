@@ -55,7 +55,7 @@ crossref:
 # select your region #
 ######################
 
-reg <- "east of england"
+reg <- "south west"
 
 library(tidyverse)
 library(janitor)
@@ -90,13 +90,13 @@ pops <- pops |>
   ) |>
   filter(!is.na(`Normalised weighted population`))
 
-source('personal_creds.R')
+serv <- "udalsyndataprod.sql.azuresynapse.net"
+db <- "UDAL_Warehouse"
 
 con_udal <- DBI::dbConnect(drv = odbc::odbc(),
                            driver = "ODBC Driver 17 for SQL Server",
                            server = serv ,
                            database = "UDAL_Warehouse",
-                           UID = id,
                            authentication = "ActiveDirectoryInteractive")
 
 dat <- DBI::dbGetQuery(conn = con_udal, statement = "
@@ -405,6 +405,44 @@ df_refs_icb <- df |>
     area = ics_name
   )
 
+# calculate 18, 52 / 104 weeks by provider
+df_waits_prov <- df |>
+  filter(metric_id %in% c("RES001cvi", "RES001cvii", "RES001cviii", "RES001c"),
+         region == reg) |>
+  mutate(metric_value = replace_na(metric_value, 0), ) |>
+  pivot_wider(names_from = metric_id, values_from = metric_value) |>
+  ungroup() |>
+  select(org_name,
+         service_short,
+         month,
+         child,
+         RES001cvi,
+         RES001cvii,
+         RES001cviii,
+         RES001c) |>
+  summarise(RES001cvi = sum(RES001cvi, na.rm = T),
+            RES001cvii = sum(RES001cvii, na.rm = T),
+            RES001cviii = sum(RES001cviii, na.rm = T),
+            RES001c = sum(RES001c, na.rm = T),
+            .by = c(org_name,
+                    service_short,
+                    child,
+                    month))|>
+  mutate(
+    perc_18 = round(sum(((RES001cvi + RES001cvii + RES001cviii) / RES001c) * 100, na.rm = TRUE), 1),
+    perc_52 = round(sum(((RES001cvii + RES001cviii) / RES001c) * 100, na.rm = TRUE), 1),
+    perc_104 = round(sum(((RES001cviii) / RES001c) * 100, na.rm = TRUE), 1),
+    .by = c(org_name,
+                    service_short,
+                    child,
+                    month)) |>
+  mutate(region = reg,
+         area = org_name,
+    area = str_remove(area, " NHS"),
+    area = str_remove(area, " FOUNDATION"),
+    area = str_remove(area, " HOSPITALS"),
+    area = str_remove(area, " TRUST"))
+
 # calculate latest percentage of over 52 / 104 weeks by ics
 # just snapshot of latest month
 df_long_ics <- df |>
@@ -479,7 +517,7 @@ df_long_reg <- df |>
 #
 # then either 'tot' or 'ref' to adjust plot title
 
-plot_serv <- function(data, serv, title) {
+plot_serv <- function(data, serv, title, val = 'tot_rate', wait = '') {
   df_service <- data |>
     filter(
       service_short == serv,
@@ -493,7 +531,7 @@ plot_serv <- function(data, serv, title) {
   }
 
   sev_plot <- ptd_spc(df_service,
-    value_field = tot_rate,
+    value_field = !!sym(val),
     date_field = month,
     improvement_direction = "decrease",
     facet_field = area
@@ -503,13 +541,16 @@ plot_serv <- function(data, serv, title) {
     paste0("SPC chart for ", serv, " - Rate of patients waiting")
   } else if (title == "ref") {
     paste0("SPC chart for ", serv, " - Number of referrals")
+  }  else if (title == "perc") {
+    paste0("SPC chart for ", serv, " - Percentage of patients waiting over ", wait)
   } else {
     paste0("SPC chart for ", serv, " - Number of patients waiting")
   }
 
   ptd <- ptd_create_ggplot(sev_plot,
     main_title = plot_title,
-    point_size = 1.5
+    point_size = 1.5,
+    x_axis_date_format = "%b %y"
   ) +
     theme(panel.spacing = unit(0.2, "cm", data = NULL))
 
@@ -1354,7 +1395,120 @@ NOTE: Many data points are missing and so caution needs to be advised when inter
 ::: {.callout-tip collapse="true" appearance="default" icon="true"}
 ## Chart Interpretation (click to expand)
 
-NOTE: This shows raw numbers of patients and not standardised rates.  Care needs to be taken in interpreting size of lists, when comparing size of provider.
+NOTE: This shows percentage of patients waiting over 18 weeks.
+
+- The letter in the top right corner represents the overall trend, L - numbers getting lower (improvement), H - numbers getting higher (deterioration), C - common cause variation (no discernible trend)  
+- Yellow points represent a increasing trend  
+- Blue point represent an improving trend  
+- Grey points show common cause variation  
+- The solid black line is the mean rate across the time series  
+- The dotted lines show the upper and lower controls based on expected levels of variation  
+
+NOTE: Many data points are missing and so caution needs to be advised when interpreting trends.
+
+:::
+
+## Detailed charts of percentage of patients waiting over 18 weeks by provider and service
+
+::: panel-tabset
+```{r}
+#| output: asis
+ res <- purrr::map_chr(list_order, \(hw) {
+                           knitr::knit_child(text = c(
+                             "### `r hw`",
+                             "", 
+                             "```{r}",
+                             "#| echo: false",
+                             "#| warning: false",
+                             "#| fig-width: 16",
+                             "#| fig-height: 8", 
+                             "plot_serv(df_waits_prov, hw, 'perc', 'perc_18', '18 weeks') +
+                             scale_y_continuous(labels = scales::percent_format( scale = 1))+
+                             xlab (NULL)",
+                             "```",
+                             "",
+                             ""
+                           ), envir = environment(), quiet = TRUE)
+                         })
+ 
+ cat(res, sep = '\n')
+```
+:::
+
+::: {.callout-tip collapse="true" appearance="default" icon="true"}
+## Chart Interpretation (click to expand)
+
+NOTE: This shows percentage of patients waiting over 18 weeks.
+
+- The letter in the top right corner represents the overall trend, L - numbers getting lower (improvement), H - numbers getting higher (deterioration), C - common cause variation (no discernible trend)  
+- Yellow points represent a increasing trend  
+- Blue point represent an improving trend  
+- Grey points show common cause variation  
+- The solid black line is the mean rate across the time series  
+- The dotted lines show the upper and lower controls based on expected levels of variation  
+
+NOTE: Many data points are missing and so caution needs to be advised when interpreting trends.
+
+:::
+
+## Detailed charts of percentage of patients waiting over 52 weeks by provider and service
+
+::: panel-tabset
+```{r}
+#| output: asis
+ res <- purrr::map_chr(list_order, \(hw) {
+                           knitr::knit_child(text = c(
+                             "### `r hw`",
+                             "", 
+                             "```{r}",
+                             "#| echo: false",
+                             "#| warning: false",
+                             "#| fig-width: 16",
+                             "#| fig-height: 8", 
+                             "plot_serv(df_waits_prov, hw, 'perc', 'perc_52', '52 weeks') +
+                             scale_y_continuous(labels = scales::percent_format( scale = 1))+
+                             xlab (NULL)",
+                             "```",
+                             "",
+                             ""
+                           ), envir = environment(), quiet = TRUE)
+                         })
+ 
+ cat(res, sep = '\n')
+```
+:::
+
+## Detailed charts of percentage of patients waiting over 52 weeks by provider and service
+
+::: panel-tabset
+```{r}
+#| output: asis
+ res <- purrr::map_chr(list_order, \(hw) {
+                           knitr::knit_child(text = c(
+                             "### `r hw`",
+                             "", 
+                             "```{r}",
+                             "#| echo: false",
+                             "#| warning: false",
+                             "#| fig-width: 16",
+                             "#| fig-height: 8", 
+                             "plot_serv(df_waits_prov, hw, 'perc', 'perc_104', '104 weeks') +
+                             scale_y_continuous(labels = scales::percent_format( scale = 1))+
+                             xlab (NULL)",
+                             "```",
+                             "",
+                             ""
+                           ), envir = environment(), quiet = TRUE)
+                         })
+ 
+ cat(res, sep = '\n')
+```
+:::
+
+::: {.callout-tip collapse="true" appearance="default" icon="true"}
+## Chart Interpretation (click to expand)
+
+NOTE: This shows percentage of patients waiting over 104 weeks.
 
 - The letter in the top right corner represents the overall trend, L - numbers getting lower (improvement), H - numbers getting higher (deterioration), C - common cause variation (no discernible trend)  
 - Yellow points represent a increasing trend  
@@ -1430,7 +1584,7 @@ The R code to produce this report is available at https://github.com/nhsengland/
 > Contact  
 > [**Simon Wellesley-Miller**](mailto:Simon.Wellesley-Miller@nhs.net)\
 > *Senior Analytical Manager*  
-> Version 1.1 4 January 2024
+> Version 1.2 1 April 2025
 
 
 :::
